@@ -17,8 +17,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<Object> findByUsername(String username);
     Optional<User> findByRememberMe(String token);
 
-    @Modifying
-    @Transactional
-    @Query("UPDATE User u SET u.rememberMe = :token WHERE u.id = :id")
-    void updateRememberMeToken(@Param("id") Long id, @Param("token") String token);
 }
