@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### uplodas ###
+uploads/videos/*
+uploads/thumbnails/*
+uploads/profilePicture/*
