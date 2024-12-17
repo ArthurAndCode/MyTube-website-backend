@@ -80,7 +80,11 @@ public class FileService {
     }
 
     private String generateUniqueFileName(String originalFileName) {
-        return UUID.randomUUID() + "_" + originalFileName;
+        String sanitizedFileName = originalFileName
+                .replaceAll("\\s+", "-")
+                .replaceAll("[^a-zA-Z0-9._-]", "")
+                .toLowerCase();
+        return UUID.randomUUID() + "_" + sanitizedFileName;
     }
 
     public static class FileStorageException extends RuntimeException {

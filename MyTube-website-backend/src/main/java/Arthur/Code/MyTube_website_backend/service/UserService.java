@@ -127,7 +127,9 @@ public class UserService {
     }
 
     private String getProfilePictureUrl(User user) {
-        return appUrl + user.getPicturePath();
+        String correctedPath = user.getPicturePath().replace("\\", "/");
+        System.out.println(appUrl + " " + correctedPath);
+        return appUrl + correctedPath;
     }
 
     private String generateToken() {
