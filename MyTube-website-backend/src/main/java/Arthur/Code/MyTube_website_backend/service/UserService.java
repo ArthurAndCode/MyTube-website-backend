@@ -38,7 +38,7 @@ public class UserService {
         if (loginRequest.isRememberMeChecked()) {
             handleRememberMe(user, response);
         }
-        return convertToDto(user);
+        return convertToUserDTO(user);
     }
 
     private User authenticateUser(LoginRequest loginRequest) {
@@ -98,6 +98,15 @@ public class UserService {
         return user;
     }
 
+    public User getUserByToken(String token) {
+        User user = userRepository.findByRememberMe(token)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (user.getRememberMeCreatedAt().isBefore(LocalDateTime.now().minusDays(7))) {
+            throw new IllegalArgumentException("Token expired");
+        }
+        return user;
+    }
+
     protected User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -108,27 +117,17 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
-    public User getUserByToken(String token) {
-        User user = userRepository.findByRememberMe(token)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        if (user.getRememberMeCreatedAt().isBefore(LocalDateTime.now().minusDays(7))) {
-            throw new IllegalArgumentException("Token expired");
-        }
-        return user;
-    }
-
-    private UserDTO convertToDto(User user) {
+    protected UserDTO convertToUserDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
-        dto.setProfilePictureUrl(getProfilePictureUrl(user));
+        dto.setProfilePictureUrl(composeUrlPath(user.getPicturePath()));
         return dto;
     }
 
-    private String getProfilePictureUrl(User user) {
-        String correctedPath = user.getPicturePath().replace("\\", "/");
-        System.out.println(appUrl + " " + correctedPath);
+    protected String composeUrlPath(String path) {
+        String correctedPath = path.replace("\\", "/");
         return appUrl + correctedPath;
     }
 

@@ -1,7 +1,7 @@
 package Arthur.Code.MyTube_website_backend.controller;
 
+import Arthur.Code.MyTube_website_backend.dto.VideoDTO;
 import Arthur.Code.MyTube_website_backend.dto.VideoUploadRequest;
-import Arthur.Code.MyTube_website_backend.model.Video;
 import Arthur.Code.MyTube_website_backend.service.VideoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

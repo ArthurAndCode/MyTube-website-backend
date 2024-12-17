@@ -1,5 +1,6 @@
 package Arthur.Code.MyTube_website_backend.service;
 
+import Arthur.Code.MyTube_website_backend.dto.VideoDTO;
 import Arthur.Code.MyTube_website_backend.dto.VideoUploadRequest;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.model.Video;
@@ -23,12 +24,26 @@ public class VideoService {
         this.fileService = fileService;
     }
 
-    public Page<Video> getSomeVideos(Pageable pageable) {
-        return videoRepository.findAll(pageable);
+    public Page<VideoDTO> getSomeVideos(Pageable pageable) {
+        Page<Video> videos = videoRepository.findAll(pageable);
+        return videos.map(this::convertToVideoDTO);
     }
 
-    public Page<Video> searchVideosByTitle(String title, Pageable pageable) {
-        return videoRepository.findByTitleContainingIgnoreCase(title, pageable);
+    public Page<VideoDTO> searchVideosByTitle(String title, Pageable pageable) {
+        Page<Video> videos = videoRepository.findByTitleContainingIgnoreCase(title, pageable);
+        return videos.map(this::convertToVideoDTO);
+    }
+
+    private VideoDTO convertToVideoDTO(Video video) {
+        VideoDTO videoDTO = new VideoDTO();
+        videoDTO.setId(video.getId());
+        videoDTO.setTitle(video.getTitle());
+        videoDTO.setDescription(video.getDescription());
+        videoDTO.setThumbnailUrl(userService.composeUrlPath(video.getThumbnailPath()));
+        videoDTO.setVideoUrl(userService.composeUrlPath(video.getFilePath()));
+        videoDTO.setUser(userService.convertToUserDTO((video.getUser())));
+        videoDTO.setCreatedAt(video.getCreatedAt());
+        return videoDTO;
     }
 
     public void uploadVideo(VideoUploadRequest request) {
