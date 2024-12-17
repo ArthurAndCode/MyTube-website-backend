@@ -28,7 +28,7 @@ public class Video {
     @Column(nullable = false, length = 500)
     private String description;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

@@ -4,6 +4,8 @@ import Arthur.Code.MyTube_website_backend.dto.VideoUploadRequest;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.model.Video;
 import Arthur.Code.MyTube_website_backend.repository.VideoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +21,14 @@ public class VideoService {
         this.videoRepository = videoRepository;
         this.userService = userService;
         this.fileService = fileService;
+    }
+
+    public Page<Video> getSomeVideos(Pageable pageable) {
+        return videoRepository.findAll(pageable);
+    }
+
+    public Page<Video> searchVideosByTitle(String title, Pageable pageable) {
+        return videoRepository.findByTitleContainingIgnoreCase(title, pageable);
     }
 
     public void uploadVideo(VideoUploadRequest request) {
@@ -39,5 +49,4 @@ public class VideoService {
         video.setCreatedAt(LocalDateTime.now());
         return video;
     }
-
 }
