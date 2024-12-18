@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface VideoRepository extends JpaRepository<Video, Long> {
-    Page<Video> findAll(Pageable pageable);
+
     Page<Video> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+    Page<Video> findAllByUserId(Long userId, Pageable pageable);
+
 }

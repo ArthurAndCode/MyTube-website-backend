@@ -1,13 +1,15 @@
 package Arthur.Code.MyTube_website_backend.service;
 
-import Arthur.Code.MyTube_website_backend.dto.LoginRequest;
-import Arthur.Code.MyTube_website_backend.dto.RegisterRequest;
-import Arthur.Code.MyTube_website_backend.dto.UserDTO;
+import Arthur.Code.MyTube_website_backend.dto.*;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +33,18 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileService = fileService;
+    }
+
+    public Page<UserDTO> getUsers(PageableRequest request) {
+        Pageable pageable = createPageable(request.getPage(), request.getSize());
+        Page<User> users = userRepository.findAll(pageable);
+        return users.map(this::convertToUserDTO);
+    }
+
+    public Page<UserDTO> searchUserByUsername(SearchUserRequest request) {
+        Pageable pageable = createPageable(request.getPage(), request.getSize());
+        Page<User> users = userRepository.findByUsernameContainingIgnoreCase(request.getUsername(), pageable);
+        return users.map(this::convertToUserDTO);
     }
 
     public UserDTO loginUser(LoginRequest loginRequest, HttpServletResponse response) {
@@ -140,8 +154,10 @@ public class UserService {
     }
 
     public void deleteRememberMe(String token, HttpServletResponse response) {
-        clearCookieInBrowser(response);
-        clearCookieInDatabase(token);
+        if (token != null) {
+            clearCookieInBrowser(response);
+            clearCookieInDatabase(token);
+        }
     }
 
     private void clearCookieInDatabase(String token) {
@@ -166,5 +182,9 @@ public class UserService {
         user.setPicturePath(profilePicturePath);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
+    }
+
+    private Pageable createPageable(int page, int size) {
+        return PageRequest.of(page, size, Sort.by("createdAt").descending());
     }
 }

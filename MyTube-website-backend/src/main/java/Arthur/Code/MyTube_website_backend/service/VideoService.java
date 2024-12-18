@@ -1,12 +1,16 @@
 package Arthur.Code.MyTube_website_backend.service;
 
+import Arthur.Code.MyTube_website_backend.dto.PageableRequest;
+import Arthur.Code.MyTube_website_backend.dto.SearchVideoRequest;
 import Arthur.Code.MyTube_website_backend.dto.VideoDTO;
 import Arthur.Code.MyTube_website_backend.dto.VideoUploadRequest;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.model.Video;
 import Arthur.Code.MyTube_website_backend.repository.VideoRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,14 +28,26 @@ public class VideoService {
         this.fileService = fileService;
     }
 
-    public Page<VideoDTO> getSomeVideos(Pageable pageable) {
+    public Page<VideoDTO> getVideos(PageableRequest request) {
+        Pageable pageable = createPageable(request.getPage(), request.getSize());
         Page<Video> videos = videoRepository.findAll(pageable);
         return videos.map(this::convertToVideoDTO);
     }
 
-    public Page<VideoDTO> searchVideosByTitle(String title, Pageable pageable) {
-        Page<Video> videos = videoRepository.findByTitleContainingIgnoreCase(title, pageable);
+    public Page<VideoDTO> getVideosByUserId(Long id, PageableRequest request) {
+        Pageable pageable = createPageable(request.getPage(), request.getSize());
+        Page<Video> videos = videoRepository.findAllByUserId(id, pageable);
         return videos.map(this::convertToVideoDTO);
+    }
+
+    public Page<VideoDTO> searchVideosByTitle(SearchVideoRequest request) {
+        Pageable pageable = createPageable(request.getPage(), request.getSize());
+        Page<Video> videos = videoRepository.findByTitleContainingIgnoreCase(request.getTitle(), pageable);
+        return videos.map(this::convertToVideoDTO);
+    }
+
+    private Pageable createPageable(int page, int size) {
+        return PageRequest.of(page, size, Sort.by("createdAt").descending());
     }
 
     private VideoDTO convertToVideoDTO(Video video) {

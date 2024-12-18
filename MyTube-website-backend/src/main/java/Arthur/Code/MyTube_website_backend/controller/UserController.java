@@ -1,11 +1,10 @@
 package Arthur.Code.MyTube_website_backend.controller;
 
-import Arthur.Code.MyTube_website_backend.dto.LoginRequest;
-import Arthur.Code.MyTube_website_backend.dto.RegisterRequest;
-import Arthur.Code.MyTube_website_backend.dto.UserDTO;
+import Arthur.Code.MyTube_website_backend.dto.*;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +21,18 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping
+    public ResponseEntity<Page<UserDTO>> getUsers(@RequestBody PageableRequest request) {
+        Page<UserDTO> users = userService.getUsers(request);
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<UserDTO>> searchUserByUsername(@RequestBody SearchUserRequest request) {
+        Page<UserDTO> users = userService.searchUserByUsername(request);
+        return ResponseEntity.ok(users);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<UserDTO> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         UserDTO userDTO = userService.loginUser(loginRequest, response);
@@ -30,9 +41,7 @@ public class UserController {
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@CookieValue(value = "rememberMeToken", required = false) String token, HttpServletResponse response) {
-        if (token != null) {
-            userService.deleteRememberMe(token, response);
-        }
+        userService.deleteRememberMe(token, response);
         return ResponseEntity.status(HttpStatus.OK).body("You have been successfully logged out.");
     }
 
@@ -42,7 +51,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No valid session token was found.");
         }
         User user = userService.getUserByToken(token);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @PostMapping
@@ -51,9 +60,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully.");
     }
 
-    @PostMapping("/{id}/upload-picture")
+    @PostMapping("/{id}/upload")
     public ResponseEntity<String> uploadProfilePicture(@PathVariable Long id, @RequestBody MultipartFile file) {
         userService.uploadProfilePicture(id, file);
-        return ResponseEntity.ok("Profile picture uploaded successfully");
+        return ResponseEntity.status(HttpStatus.OK).body("Profile picture uploaded successfully");
     }
 }
