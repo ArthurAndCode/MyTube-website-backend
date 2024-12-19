@@ -42,4 +42,9 @@ public class VideoController {
         return ResponseEntity.ok("Video uploaded successfully");
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteVideo(@PathVariable Long id) {
+        videoService.deleteVideo(id);
+        return ResponseEntity.ok("Video deleted successfully");
+    }
 }

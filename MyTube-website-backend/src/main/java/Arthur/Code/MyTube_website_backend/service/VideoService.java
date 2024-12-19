@@ -46,6 +46,35 @@ public class VideoService {
         return videos.map(this::convertToVideoDTO);
     }
 
+    public void uploadVideo(VideoUploadRequest request) {
+        User user = userService.getUserById(request.getUserId());
+        String videoPath = fileService.saveFile(request.getVideo(), FileService.FileType.VIDEO);
+        String thumbnailPath = fileService.saveFile(request.getThumbnail(), FileService.FileType.THUMBNAIL);
+        Video video = createVideoEntity(request, user, videoPath, thumbnailPath);
+        videoRepository.save(video);
+    }
+
+    public void deleteVideo(Long videoId) {
+        Video video = getVideoById(videoId);
+        deleteAssociatedFiles(video);
+        videoRepository.delete(video);
+    }
+
+    private void deleteAssociatedFiles(Video video) {
+        try {
+            fileService.deleteFile(video.getFilePath());
+            fileService.deleteFile(video.getThumbnailPath());
+        } catch (FileService.FileStorageException e) {
+            throw new RuntimeException("Failed to delete associated files for video");
+        }
+    }
+
+    private Video getVideoById(Long videoId) {
+        return videoRepository.findById(videoId)
+                .orElseThrow(() -> new IllegalArgumentException("Video not found."));
+    }
+
+
     private Pageable createPageable(int page, int size) {
         return PageRequest.of(page, size, Sort.by("createdAt").descending());
     }
@@ -60,14 +89,6 @@ public class VideoService {
         videoDTO.setUser(userService.convertToUserDTO((video.getUser())));
         videoDTO.setCreatedAt(video.getCreatedAt());
         return videoDTO;
-    }
-
-    public void uploadVideo(VideoUploadRequest request) {
-        User user = userService.getUserById(request.getUserId());
-        String videoPath = fileService.saveFile(request.getVideo(), FileService.FileType.VIDEO);
-        String thumbnailPath = fileService.saveFile(request.getThumbnail(), FileService.FileType.THUMBNAIL);
-        Video video = createVideoEntity(request, user, videoPath, thumbnailPath);
-        videoRepository.save(video);
     }
 
     private Video createVideoEntity(VideoUploadRequest request, User user, String videoPath, String thumbnailPath) {
