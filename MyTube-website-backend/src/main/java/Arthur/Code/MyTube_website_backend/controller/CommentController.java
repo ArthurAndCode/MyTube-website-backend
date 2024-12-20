@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/videos/{id}/comments")
+@RequestMapping("/api/v1/videos")
 public class CommentController {
 
     private final CommentService commentService;
@@ -18,16 +18,22 @@ public class CommentController {
         this.commentService = commentService;
     }
     //nie zwracam video id, nie wiem czy tak zostanie
-    @GetMapping()
+    @GetMapping("/{id}/comments")
     public ResponseEntity<Page<CommentResponse>> getVideoComments(@PathVariable Long id, @RequestBody PageableRequest pageableRequest) {
         Page<CommentResponse> comments = commentService.getVideoComments(id, pageableRequest);
         return ResponseEntity.ok(comments);
     }
 
-    @PostMapping()
+    @PostMapping("/{id}/comments")
     public ResponseEntity<String> addComment(@PathVariable Long id, @RequestBody CommentRequest commentRequest) {
         commentService.addComment(id, commentRequest);
         return ResponseEntity.ok("Comment added successfully");
+    }
+
+    @DeleteMapping("/comments/{id}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long id) {
+        commentService.deleteComment(id);
+        return ResponseEntity.ok("Comment deleted successfully");
     }
 
 }

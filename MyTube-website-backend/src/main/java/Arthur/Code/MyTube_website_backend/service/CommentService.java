@@ -31,6 +31,22 @@ public class CommentService {
         return videos.map(this::convertToCommentResponse);
     }
 
+    public void addComment(Long videoId, CommentRequest commentRequest) {
+        User user = userService.getUserById(commentRequest.getUserId());
+        Comment comment = CreateCommentEntity(videoId, commentRequest, user);
+        commentRepository.save(comment);
+    }
+
+    public void deleteComment(Long commentId) {
+        Comment comment = getCommentById(commentId);
+        commentRepository.delete(comment);
+    }
+
+    private Comment getCommentById(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("Comment not found."));
+    }
+
     private CommentResponse convertToCommentResponse(Comment comment) {
         CommentResponse commentResponse = new CommentResponse();
         commentResponse.setId(comment.getId());
@@ -38,12 +54,6 @@ public class CommentService {
         commentResponse.setUser(userService.convertToUserDTO((comment.getUser())));
         commentResponse.setCreatedAt(comment.getCreatedAt());
         return commentResponse;
-    }
-
-    public void addComment(Long videoId, CommentRequest commentRequest) {
-        User user = userService.getUserById(commentRequest.getUserId());
-        Comment comment = CreateCommentEntity(videoId, commentRequest, user);
-        commentRepository.save(comment);
     }
 
     private static Comment CreateCommentEntity(Long videoId, CommentRequest commentRequest, User user) {
