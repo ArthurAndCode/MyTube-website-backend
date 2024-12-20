@@ -20,9 +20,8 @@ public class Comment {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "video_id", nullable = false)
-    private Video video;
+    @Column(name = "video_id", nullable = false)
+    private Long videoId;
 
     @Column(nullable = false)
     private String content;

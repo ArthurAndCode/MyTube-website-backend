@@ -55,7 +55,7 @@ public class VideoService {
     }
 
     public void deleteVideo(Long videoId) {
-        Video video = getVideoById(videoId);
+        Video video = getVideoByVideoId(videoId);
         deleteAssociatedFiles(video);
         videoRepository.delete(video);
     }
@@ -69,7 +69,7 @@ public class VideoService {
         }
     }
 
-    private Video getVideoById(Long videoId) {
+    protected Video getVideoByVideoId(Long videoId) {
         return videoRepository.findById(videoId)
                 .orElseThrow(() -> new IllegalArgumentException("Video not found."));
     }
