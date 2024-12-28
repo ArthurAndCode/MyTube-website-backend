@@ -7,6 +7,7 @@ import Arthur.Code.MyTube_website_backend.repository.VideoReactionRepository;
 import Arthur.Code.MyTube_website_backend.repository.VideoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -98,17 +99,20 @@ public class VideoReactionService {
         reaction.setUserId(userId);
         reaction.setLiked(false);
         reaction.setDisliked(false);
+        reaction.setCreatedAt(LocalDateTime.now());
         return reaction;
     }
 
     private void toggleLikeReaction(VideoReaction reaction) {
         reaction.setLiked(!Boolean.TRUE.equals(reaction.getLiked()));
         reaction.setDisliked(false);
+        reaction.setCreatedAt(LocalDateTime.now());
     }
 
     private void toggleDislikeReaction(VideoReaction reaction) {
         reaction.setDisliked(!Boolean.TRUE.equals(reaction.getDisliked()));
         reaction.setLiked(false);
+        reaction.setCreatedAt(LocalDateTime.now());
     }
 
     private Video getVideoByVideoId(Long videoId) {

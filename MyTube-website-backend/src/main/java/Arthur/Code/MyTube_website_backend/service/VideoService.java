@@ -6,6 +6,8 @@ import Arthur.Code.MyTube_website_backend.dto.response.VideoResponse;
 import Arthur.Code.MyTube_website_backend.dto.request.VideoUploadRequest;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.model.Video;
+import Arthur.Code.MyTube_website_backend.model.VideoReaction;
+import Arthur.Code.MyTube_website_backend.repository.VideoReactionRepository;
 import Arthur.Code.MyTube_website_backend.repository.VideoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,16 +16,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class VideoService {
 
     private final VideoRepository videoRepository;
+    private final VideoReactionRepository videoReactionRepository;
     private final UserService userService;
     private final FileService fileService;
 
-    public VideoService(VideoRepository videoRepository, UserService userService, FileService fileService) {
+    public VideoService(VideoRepository videoRepository, VideoReactionRepository videoReactionRepository, UserService userService, FileService fileService) {
         this.videoRepository = videoRepository;
+        this.videoReactionRepository = videoReactionRepository;
         this.userService = userService;
         this.fileService = fileService;
     }
@@ -101,4 +107,19 @@ public class VideoService {
         video.setCreatedAt(LocalDateTime.now());
         return video;
     }
+
+    public Page<VideoResponse> getLikedVideos(Long userId, PageableRequest request) {
+        Pageable pageable = createPageable(request.getPage(), request.getSize());
+        Page<VideoReaction> reactions = videoReactionRepository.findAllByUserIdAndLikedTrue(userId, pageable);
+        List<Long> likedVideoIds = getVideoIds(reactions);
+        Page<Video> likedVideos = videoRepository.findAllByIdIn(likedVideoIds, pageable);
+        return likedVideos.map(this::convertToVideoDTO);
+    }
+
+    private static List<Long> getVideoIds(Page<VideoReaction> reactions) {
+        return reactions.stream()
+                .map(reaction -> reaction.getVideo().getId())
+                .collect(Collectors.toList());
+    }
+
 }

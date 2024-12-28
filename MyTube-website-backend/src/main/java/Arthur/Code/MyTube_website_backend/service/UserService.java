@@ -145,6 +145,9 @@ public class UserService {
     }
 
     protected String composeUrlPath(String path) {
+        if (path == null) {
+            return null;
+        }
         String correctedPath = path.replace("\\", "/");
         return appUrl + correctedPath;
     }

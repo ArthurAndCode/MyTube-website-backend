@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -29,5 +31,9 @@ public class VideoReaction {
 
     @Column(nullable = false)
     private Boolean disliked;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
 }
 

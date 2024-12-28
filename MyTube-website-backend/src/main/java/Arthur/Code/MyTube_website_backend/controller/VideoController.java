@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/videos")
 public class VideoController {
+
     private final VideoService videoService;
 
     public VideoController(VideoService videoService) {
@@ -33,6 +34,12 @@ public class VideoController {
     @GetMapping("/search")
     public ResponseEntity<Page<VideoResponse>> searchVideosByTitle(@RequestBody SearchVideoRequest request) {
         Page<VideoResponse> videos = videoService.searchVideosByTitle(request);
+        return ResponseEntity.ok(videos);
+    }
+
+    @GetMapping("/users/{id}/liked")
+    public ResponseEntity<Page<VideoResponse>> getLikedVideos(@PathVariable Long id, @RequestBody PageableRequest request) {
+        Page<VideoResponse> videos = videoService.getLikedVideos(id, request);
         return ResponseEntity.ok(videos);
     }
 
