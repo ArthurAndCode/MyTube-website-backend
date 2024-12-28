@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
+
+    boolean existsBySubscriberIdAndChannelId(Long subscriberId, Long channelId);
+
 }

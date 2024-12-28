@@ -1,4 +1,4 @@
-package Arthur.Code.MyTube_website_backend.dto;
+package Arthur.Code.MyTube_website_backend.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

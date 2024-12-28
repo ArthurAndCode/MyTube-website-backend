@@ -1,9 +1,9 @@
 package Arthur.Code.MyTube_website_backend.service;
 
-import Arthur.Code.MyTube_website_backend.dto.PageableRequest;
-import Arthur.Code.MyTube_website_backend.dto.SearchVideoRequest;
-import Arthur.Code.MyTube_website_backend.dto.VideoDTO;
-import Arthur.Code.MyTube_website_backend.dto.VideoUploadRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.PageableRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.SearchVideoRequest;
+import Arthur.Code.MyTube_website_backend.dto.response.VideoResponse;
+import Arthur.Code.MyTube_website_backend.dto.request.VideoUploadRequest;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.model.Video;
 import Arthur.Code.MyTube_website_backend.repository.VideoRepository;
@@ -28,19 +28,19 @@ public class VideoService {
         this.fileService = fileService;
     }
 
-    public Page<VideoDTO> getVideos(PageableRequest request) {
+    public Page<VideoResponse> getVideos(PageableRequest request) {
         Pageable pageable = createPageable(request.getPage(), request.getSize());
         Page<Video> videos = videoRepository.findAll(pageable);
         return videos.map(this::convertToVideoDTO);
     }
 
-    public Page<VideoDTO> getVideosByUserId(Long id, PageableRequest request) {
+    public Page<VideoResponse> getVideosByUserId(Long id, PageableRequest request) {
         Pageable pageable = createPageable(request.getPage(), request.getSize());
         Page<Video> videos = videoRepository.findAllByUserId(id, pageable);
         return videos.map(this::convertToVideoDTO);
     }
 
-    public Page<VideoDTO> searchVideosByTitle(SearchVideoRequest request) {
+    public Page<VideoResponse> searchVideosByTitle(SearchVideoRequest request) {
         Pageable pageable = createPageable(request.getPage(), request.getSize());
         Page<Video> videos = videoRepository.findByTitleContainingIgnoreCase(request.getTitle(), pageable);
         return videos.map(this::convertToVideoDTO);
@@ -69,7 +69,7 @@ public class VideoService {
         }
     }
 
-    protected Video getVideoByVideoId(Long videoId) {
+    private Video getVideoByVideoId(Long videoId) {
         return videoRepository.findById(videoId)
                 .orElseThrow(() -> new IllegalArgumentException("Video not found."));
     }
@@ -79,16 +79,16 @@ public class VideoService {
         return PageRequest.of(page, size, Sort.by("createdAt").descending());
     }
 
-    private VideoDTO convertToVideoDTO(Video video) {
-        VideoDTO videoDTO = new VideoDTO();
-        videoDTO.setId(video.getId());
-        videoDTO.setTitle(video.getTitle());
-        videoDTO.setDescription(video.getDescription());
-        videoDTO.setThumbnailUrl(userService.composeUrlPath(video.getThumbnailPath()));
-        videoDTO.setVideoUrl(userService.composeUrlPath(video.getFilePath()));
-        videoDTO.setUser(userService.convertToUserDTO((video.getUser())));
-        videoDTO.setCreatedAt(video.getCreatedAt());
-        return videoDTO;
+    private VideoResponse convertToVideoDTO(Video video) {
+        VideoResponse videoResponse = new VideoResponse();
+        videoResponse.setId(video.getId());
+        videoResponse.setTitle(video.getTitle());
+        videoResponse.setDescription(video.getDescription());
+        videoResponse.setThumbnailUrl(userService.composeUrlPath(video.getThumbnailPath()));
+        videoResponse.setVideoUrl(userService.composeUrlPath(video.getFilePath()));
+        videoResponse.setUser(userService.convertToUserDTO((video.getUser())));
+        videoResponse.setCreatedAt(video.getCreatedAt());
+        return videoResponse;
     }
 
     private Video createVideoEntity(VideoUploadRequest request, User user, String videoPath, String thumbnailPath) {

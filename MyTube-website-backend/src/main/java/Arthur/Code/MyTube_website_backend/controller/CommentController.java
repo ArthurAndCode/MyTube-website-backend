@@ -1,8 +1,8 @@
 package Arthur.Code.MyTube_website_backend.controller;
 
-import Arthur.Code.MyTube_website_backend.dto.CommentRequest;
-import Arthur.Code.MyTube_website_backend.dto.CommentResponse;
-import Arthur.Code.MyTube_website_backend.dto.PageableRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.CommentRequest;
+import Arthur.Code.MyTube_website_backend.dto.response.CommentResponse;
+import Arthur.Code.MyTube_website_backend.dto.request.PageableRequest;
 import Arthur.Code.MyTube_website_backend.service.CommentService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

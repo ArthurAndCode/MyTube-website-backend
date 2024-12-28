@@ -1,8 +1,8 @@
 package Arthur.Code.MyTube_website_backend.service;
 
-import Arthur.Code.MyTube_website_backend.dto.CommentRequest;
-import Arthur.Code.MyTube_website_backend.dto.CommentResponse;
-import Arthur.Code.MyTube_website_backend.dto.PageableRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.CommentRequest;
+import Arthur.Code.MyTube_website_backend.dto.response.CommentResponse;
+import Arthur.Code.MyTube_website_backend.dto.request.PageableRequest;
 import Arthur.Code.MyTube_website_backend.model.Comment;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.repository.CommentRepository;

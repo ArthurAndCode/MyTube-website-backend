@@ -1,9 +1,9 @@
 package Arthur.Code.MyTube_website_backend.controller;
 
-import Arthur.Code.MyTube_website_backend.dto.PageableRequest;
-import Arthur.Code.MyTube_website_backend.dto.SearchVideoRequest;
-import Arthur.Code.MyTube_website_backend.dto.VideoDTO;
-import Arthur.Code.MyTube_website_backend.dto.VideoUploadRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.PageableRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.SearchVideoRequest;
+import Arthur.Code.MyTube_website_backend.dto.response.VideoResponse;
+import Arthur.Code.MyTube_website_backend.dto.request.VideoUploadRequest;
 import Arthur.Code.MyTube_website_backend.service.VideoService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -19,20 +19,20 @@ public class VideoController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<VideoDTO>> getVideos(@RequestBody PageableRequest request) {
-        Page<VideoDTO> videos = videoService.getVideos(request);
+    public ResponseEntity<Page<VideoResponse>> getVideos(@RequestBody PageableRequest request) {
+        Page<VideoResponse> videos = videoService.getVideos(request);
         return ResponseEntity.ok(videos);
     }
 
     @GetMapping( "/users/{id}")
-    public ResponseEntity<Page<VideoDTO>> getVideosByUserId(@PathVariable Long id, @RequestBody PageableRequest request) {
-        Page<VideoDTO> videos = videoService.getVideosByUserId(id ,request);
+    public ResponseEntity<Page<VideoResponse>> getVideosByUserId(@PathVariable Long id, @RequestBody PageableRequest request) {
+        Page<VideoResponse> videos = videoService.getVideosByUserId(id ,request);
         return ResponseEntity.ok(videos);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<VideoDTO>> searchVideosByTitle(@RequestBody SearchVideoRequest request) {
-        Page<VideoDTO> videos = videoService.searchVideosByTitle(request);
+    public ResponseEntity<Page<VideoResponse>> searchVideosByTitle(@RequestBody SearchVideoRequest request) {
+        Page<VideoResponse> videos = videoService.searchVideosByTitle(request);
         return ResponseEntity.ok(videos);
     }
 

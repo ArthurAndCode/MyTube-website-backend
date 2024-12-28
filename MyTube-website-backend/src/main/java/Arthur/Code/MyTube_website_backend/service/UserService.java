@@ -1,6 +1,10 @@
 package Arthur.Code.MyTube_website_backend.service;
 
-import Arthur.Code.MyTube_website_backend.dto.*;
+import Arthur.Code.MyTube_website_backend.dto.request.LoginRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.PageableRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.RegisterRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.SearchUserRequest;
+import Arthur.Code.MyTube_website_backend.dto.response.UserResponse;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -35,19 +39,19 @@ public class UserService {
         this.fileService = fileService;
     }
 
-    public Page<UserDTO> getUsers(PageableRequest request) {
+    public Page<UserResponse> getUsers(PageableRequest request) {
         Pageable pageable = createPageable(request.getPage(), request.getSize());
         Page<User> users = userRepository.findAll(pageable);
         return users.map(this::convertToUserDTO);
     }
 
-    public Page<UserDTO> searchUserByUsername(SearchUserRequest request) {
+    public Page<UserResponse> searchUserByUsername(SearchUserRequest request) {
         Pageable pageable = createPageable(request.getPage(), request.getSize());
         Page<User> users = userRepository.findByUsernameContainingIgnoreCase(request.getUsername(), pageable);
         return users.map(this::convertToUserDTO);
     }
 
-    public UserDTO loginUser(LoginRequest loginRequest, HttpServletResponse response) {
+    public UserResponse loginUser(LoginRequest loginRequest, HttpServletResponse response) {
         User user = authenticateUser(loginRequest);
         if (loginRequest.isRememberMeChecked()) {
             handleRememberMe(user, response);
@@ -131,8 +135,8 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
-    protected UserDTO convertToUserDTO(User user) {
-        UserDTO dto = new UserDTO();
+    protected UserResponse convertToUserDTO(User user) {
+        UserResponse dto = new UserResponse();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());

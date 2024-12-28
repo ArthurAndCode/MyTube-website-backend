@@ -1,6 +1,10 @@
 package Arthur.Code.MyTube_website_backend.controller;
 
-import Arthur.Code.MyTube_website_backend.dto.*;
+import Arthur.Code.MyTube_website_backend.dto.request.LoginRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.PageableRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.RegisterRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.SearchUserRequest;
+import Arthur.Code.MyTube_website_backend.dto.response.UserResponse;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,21 +26,21 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserDTO>> getUsers(@RequestBody PageableRequest request) {
-        Page<UserDTO> users = userService.getUsers(request);
+    public ResponseEntity<Page<UserResponse>> getUsers(@RequestBody PageableRequest request) {
+        Page<UserResponse> users = userService.getUsers(request);
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<UserDTO>> searchUserByUsername(@RequestBody SearchUserRequest request) {
-        Page<UserDTO> users = userService.searchUserByUsername(request);
+    public ResponseEntity<Page<UserResponse>> searchUserByUsername(@RequestBody SearchUserRequest request) {
+        Page<UserResponse> users = userService.searchUserByUsername(request);
         return ResponseEntity.ok(users);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        UserDTO userDTO = userService.loginUser(loginRequest, response);
-        return ResponseEntity.status(HttpStatus.OK).body(userDTO);
+    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        UserResponse userResponse = userService.loginUser(loginRequest, response);
+        return ResponseEntity.status(HttpStatus.OK).body(userResponse);
     }
 
     @PostMapping("/logout")
