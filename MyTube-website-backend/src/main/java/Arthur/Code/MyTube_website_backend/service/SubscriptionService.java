@@ -1,9 +1,13 @@
 package Arthur.Code.MyTube_website_backend.service;
 
+import Arthur.Code.MyTube_website_backend.model.Subscription;
 import Arthur.Code.MyTube_website_backend.model.Video;
 import Arthur.Code.MyTube_website_backend.repository.SubscriptionRepository;
 import Arthur.Code.MyTube_website_backend.repository.VideoRepository;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class SubscriptionService {
@@ -14,6 +18,38 @@ public class SubscriptionService {
     public SubscriptionService(SubscriptionRepository subscriptionRepository, VideoRepository videoRepository) {
         this.subscriptionRepository = subscriptionRepository;
         this.videoRepository = videoRepository;
+    }
+
+    public void toggleSubscription(Long userId, Long channelId) {
+        validateSubscriptionRequest(userId, channelId);
+        Optional<Subscription> existingSubscription = findSubscription(userId, channelId);
+        if (existingSubscription.isPresent()) {
+            removeSubscription(existingSubscription.get());
+        } else {
+            createSubscription(userId, channelId);
+        }
+    }
+
+    private void validateSubscriptionRequest(Long userId, Long channelId) {
+        if (userId.equals(channelId)) {
+            throw new IllegalArgumentException("User ID and channel ID cannot be the same.");
+        }
+    }
+
+    private Optional<Subscription> findSubscription(Long userId, Long channelId) {
+        return subscriptionRepository.findBySubscriberIdAndChannelId(userId, channelId);
+    }
+
+    private void removeSubscription(Subscription subscription) {
+        subscriptionRepository.delete(subscription);
+    }
+
+    private void createSubscription(Long userId, Long channelId) {
+        Subscription subscription = new Subscription();
+        subscription.setSubscriberId(userId);
+        subscription.setChannelId(channelId);
+        subscription.setCreatedAt(LocalDateTime.now());
+        subscriptionRepository.save(subscription);
     }
 
     public boolean isUserSubscribed(Long videoId, Long subscriberId) {

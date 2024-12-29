@@ -27,17 +27,6 @@ public class VideoReactionController {
         return ResponseEntity.ok().build();
     }
 
-    //VID CONTROLLER
-    //getAllLikedVideosByUserId
-    //pageable
-
-
-    //SUB CONTROLLER
-    //sub
-    //unsub
-    //count sub
-
-
     //USER CONTROLLER
     //get all subscribed canals
 }
