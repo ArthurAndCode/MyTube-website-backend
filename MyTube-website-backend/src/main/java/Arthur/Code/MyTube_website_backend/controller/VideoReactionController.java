@@ -27,6 +27,4 @@ public class VideoReactionController {
         return ResponseEntity.ok().build();
     }
 
-    //USER CONTROLLER
-    //get all subscribed canals
 }

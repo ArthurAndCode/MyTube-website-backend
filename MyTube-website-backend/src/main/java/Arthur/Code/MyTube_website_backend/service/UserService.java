@@ -5,7 +5,10 @@ import Arthur.Code.MyTube_website_backend.dto.request.PageableRequest;
 import Arthur.Code.MyTube_website_backend.dto.request.RegisterRequest;
 import Arthur.Code.MyTube_website_backend.dto.request.SearchUserRequest;
 import Arthur.Code.MyTube_website_backend.dto.response.UserResponse;
+import Arthur.Code.MyTube_website_backend.model.Subscription;
 import Arthur.Code.MyTube_website_backend.model.User;
+import Arthur.Code.MyTube_website_backend.model.VideoReaction;
+import Arthur.Code.MyTube_website_backend.repository.SubscriptionRepository;
 import Arthur.Code.MyTube_website_backend.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,22 +22,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final SubscriptionRepository subscriptionRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final FileService fileService;
+
 
 
     @Value("${app.url}")
     private String appUrl;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, FileService fileService) {
+    public UserService(UserRepository userRepository, SubscriptionRepository subscriptionRepository, BCryptPasswordEncoder passwordEncoder, FileService fileService) {
         this.userRepository = userRepository;
+        this.subscriptionRepository = subscriptionRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileService = fileService;
     }
@@ -193,5 +201,19 @@ public class UserService {
 
     private Pageable createPageable(int page, int size) {
         return PageRequest.of(page, size, Sort.by("createdAt").descending());
+    }
+
+    public Page<UserResponse> getMySubscriptions(Long id, PageableRequest request) {
+        Pageable pageable = createPageable(request.getPage(), request.getSize());
+        Page<Subscription> subscriptions = subscriptionRepository.findAllBySubscriberId(id, pageable);
+        List<Long> userIds = getUsersIds(subscriptions);
+        Page<User> subscribedUsers = userRepository.findAllByIdIn(userIds, pageable);
+        return subscribedUsers.map(this::convertToUserDTO);
+    }
+
+    private static List<Long> getUsersIds(Page<Subscription> subscriptions) {
+        return subscriptions.stream()
+                .map(Subscription::getChannelId)
+                .collect(Collectors.toList());
     }
 }

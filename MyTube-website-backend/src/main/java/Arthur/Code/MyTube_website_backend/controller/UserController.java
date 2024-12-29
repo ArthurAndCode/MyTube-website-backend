@@ -37,6 +37,12 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
+    @GetMapping("/{id}/my-subscriptions")
+    public ResponseEntity<Page<UserResponse>> getMySubscriptions(@PathVariable Long id, @RequestBody PageableRequest request) {
+        Page<UserResponse> users = userService.getMySubscriptions(id, request);
+        return ResponseEntity.ok(users);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         UserResponse userResponse = userService.loginUser(loginRequest, response);
