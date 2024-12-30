@@ -17,7 +17,7 @@ public class CommentController {
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
-    //nie zwracam video id, nie wiem czy tak zostanie
+
     @GetMapping("/{id}/comments")
     public ResponseEntity<Page<CommentResponse>> getVideoComments(@PathVariable Long id, @RequestBody PageableRequest pageableRequest) {
         Page<CommentResponse> comments = commentService.getVideoComments(id, pageableRequest);

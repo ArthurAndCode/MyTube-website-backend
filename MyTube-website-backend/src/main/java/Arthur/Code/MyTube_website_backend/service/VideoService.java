@@ -9,13 +9,11 @@ import Arthur.Code.MyTube_website_backend.model.Video;
 import Arthur.Code.MyTube_website_backend.model.VideoReaction;
 import Arthur.Code.MyTube_website_backend.repository.VideoReactionRepository;
 import Arthur.Code.MyTube_website_backend.repository.VideoRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -112,8 +110,21 @@ public class VideoService {
         Pageable pageable = createPageable(request.getPage(), request.getSize());
         Page<VideoReaction> reactions = videoReactionRepository.findAllByUserIdAndLikedTrue(userId, pageable);
         List<Long> likedVideoIds = getVideoIds(reactions);
-        Page<Video> likedVideos = videoRepository.findAllByIdIn(likedVideoIds, pageable);
-        return likedVideos.map(this::convertToVideoDTO);
+        List<Video> likedVideos = videoRepository.findAllByIdIn(likedVideoIds);
+        List<VideoResponse> sortedVideos = getSortedVideoResponses(reactions, likedVideos);
+        return new PageImpl<>(sortedVideos, pageable, reactions.getTotalElements());
+    }
+
+    private List<VideoResponse> getSortedVideoResponses(Page<VideoReaction> reactions, List<Video> videos) {
+        List<VideoResponse> videoResponses = new ArrayList<>();
+        for (VideoReaction reaction : reactions) {
+            Long videoId = reaction.getVideo().getId();
+            videos.stream()
+                    .filter(video -> video.getId().equals(videoId))
+                    .findFirst()
+                    .ifPresent(video -> videoResponses.add(convertToVideoDTO(video)));
+        }
+        return videoResponses;
     }
 
     private static List<Long> getVideoIds(Page<VideoReaction> reactions) {

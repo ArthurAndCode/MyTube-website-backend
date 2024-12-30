@@ -7,21 +7,18 @@ import Arthur.Code.MyTube_website_backend.dto.request.SearchUserRequest;
 import Arthur.Code.MyTube_website_backend.dto.response.UserResponse;
 import Arthur.Code.MyTube_website_backend.model.Subscription;
 import Arthur.Code.MyTube_website_backend.model.User;
-import Arthur.Code.MyTube_website_backend.model.VideoReaction;
 import Arthur.Code.MyTube_website_backend.repository.SubscriptionRepository;
 import Arthur.Code.MyTube_website_backend.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -206,14 +203,28 @@ public class UserService {
     public Page<UserResponse> getMySubscriptions(Long id, PageableRequest request) {
         Pageable pageable = createPageable(request.getPage(), request.getSize());
         Page<Subscription> subscriptions = subscriptionRepository.findAllBySubscriberId(id, pageable);
-        List<Long> userIds = getUsersIds(subscriptions);
-        Page<User> subscribedUsers = userRepository.findAllByIdIn(userIds, pageable);
-        return subscribedUsers.map(this::convertToUserDTO);
+        List<Long> channelIds = getChannelsIds(subscriptions);
+        List<User> users = userRepository.findAllByIdIn(channelIds);
+        List<UserResponse> userResponses = getSortedUserResponses(subscriptions, users);
+        return new PageImpl<>(userResponses, pageable, subscriptions.getTotalElements());
     }
 
-    private static List<Long> getUsersIds(Page<Subscription> subscriptions) {
+    private List<UserResponse> getSortedUserResponses(Page<Subscription> subscriptions, List<User> users) {
+        List<UserResponse> userResponses = new ArrayList<>();
+        for (Subscription subscription : subscriptions) {
+            Long channelId = subscription.getChannelId();
+            users.stream()
+                    .filter(user -> user.getId().equals(channelId))
+                    .findFirst()
+                    .ifPresent(user -> userResponses.add(convertToUserDTO(user)));
+        }
+        return userResponses;
+    }
+
+    private static List<Long> getChannelsIds(Page<Subscription> subscriptions) {
         return subscriptions.stream()
                 .map(Subscription::getChannelId)
                 .collect(Collectors.toList());
     }
+
 }
