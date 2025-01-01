@@ -14,13 +14,14 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "password_resets")
-public class PasswordReset {
+public class PasswordResetToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String email;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private String token;

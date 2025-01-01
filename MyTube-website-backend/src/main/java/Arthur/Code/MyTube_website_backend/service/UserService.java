@@ -1,12 +1,11 @@
 package Arthur.Code.MyTube_website_backend.service;
 
-import Arthur.Code.MyTube_website_backend.dto.request.LoginRequest;
-import Arthur.Code.MyTube_website_backend.dto.request.PageableRequest;
-import Arthur.Code.MyTube_website_backend.dto.request.RegisterRequest;
-import Arthur.Code.MyTube_website_backend.dto.request.SearchUserRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.*;
 import Arthur.Code.MyTube_website_backend.dto.response.UserResponse;
+import Arthur.Code.MyTube_website_backend.model.PasswordResetToken;
 import Arthur.Code.MyTube_website_backend.model.Subscription;
 import Arthur.Code.MyTube_website_backend.model.User;
+import Arthur.Code.MyTube_website_backend.repository.PasswordResetRepository;
 import Arthur.Code.MyTube_website_backend.repository.SubscriptionRepository;
 import Arthur.Code.MyTube_website_backend.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -28,20 +27,22 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordResetRepository passwordResetRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final FileService fileService;
-
-
+    private final EmailService emailService;
 
     @Value("${app.url}")
     private String appUrl;
 
-    public UserService(UserRepository userRepository, SubscriptionRepository subscriptionRepository, BCryptPasswordEncoder passwordEncoder, FileService fileService) {
+    public UserService(UserRepository userRepository, PasswordResetRepository passwordResetRepository, SubscriptionRepository subscriptionRepository, BCryptPasswordEncoder passwordEncoder, FileService fileService, EmailService emailService) {
         this.userRepository = userRepository;
+        this.passwordResetRepository = passwordResetRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.passwordEncoder = passwordEncoder;
         this.fileService = fileService;
+        this.emailService = emailService;
     }
 
     public Page<UserResponse> getUsers(PageableRequest request) {
@@ -66,10 +67,14 @@ public class UserService {
 
     private User authenticateUser(LoginRequest loginRequest) {
         User user = getUserByEmail(loginRequest.getEmail());
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+        comparePasswords(loginRequest.getPassword(), user.getPassword());
+        return user;
+    }
+
+    private void comparePasswords(String firstPassword, String secondPassword) {
+        if (!passwordEncoder.matches(firstPassword, secondPassword)) {
             throw new IllegalStateException("Invalid password.");
         }
-        return user;
     }
 
     private void handleRememberMe(User user, HttpServletResponse response) {
@@ -78,7 +83,7 @@ public class UserService {
     }
 
     private String generateAndAttachCookie(HttpServletResponse response) {
-        String token = generateToken();
+        String token = generateUniqueId();
         Cookie cookie = createRememberMeCookie(token);
         response.addCookie(cookie);
         return token;
@@ -157,7 +162,7 @@ public class UserService {
         return appUrl + correctedPath;
     }
 
-    private String generateToken() {
+    private String generateUniqueId() {
         return UUID.randomUUID().toString();
     }
 
@@ -225,6 +230,73 @@ public class UserService {
         return subscriptions.stream()
                 .map(Subscription::getChannelId)
                 .collect(Collectors.toList());
+    }
+
+    public void updatePassword(Long id, ChangePasswordRequest request) {
+        User user = getUserById(id);
+        comparePasswords(request.getOldPassword(), user.getPassword());
+        user.setPassword(hashPassword(request.getNewPassword()));
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    public void updateEmail(Long id, ChangeEmailRequest request) {
+        User user = getUserById(id);
+        comparePasswords(request.getPassword(), user.getPassword());
+        user.setEmail(request.getEmail());
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    public void handleResetPasswordRequest(String email) {
+        System.out.println(email);
+        User user = getUserByEmail(email);
+        deleteOldToken(user);
+        PasswordResetToken tokenEntity = createPasswordResetTokenEntity(user);
+        passwordResetRepository.save(tokenEntity);
+        emailService.sendPasswordResetLink(email, tokenEntity);
+    }
+
+    private void deleteOldToken(User user) {
+        PasswordResetToken existingToken = passwordResetRepository.findByUserId(user.getId());
+        if (existingToken != null) {
+            passwordResetRepository.delete(existingToken);
+        }
+    }
+
+    private PasswordResetToken createPasswordResetTokenEntity(User user) {
+        String token = generateUniqueId();
+        PasswordResetToken tokenEntity = new PasswordResetToken();
+        tokenEntity.setUser(user);
+        tokenEntity.setToken(token);
+        tokenEntity.setCreatedAt(LocalDateTime.now());
+        return tokenEntity;
+    }
+
+    public void handleResetPassword(String token) {
+        User user = getUserByPasswordResetToken(token);
+        String temporaryPassword = generateUniqueId().substring(0, 8);
+        user.setPassword(hashPassword(temporaryPassword));
+        user.setUpdatedAt(LocalDateTime.now());
+        emailService.sendTemporaryPassword(user.getEmail(), temporaryPassword);
+        deleteOldToken(user);
+
+    }
+
+    private User getUserByPasswordResetToken(String token) {
+        PasswordResetToken passwordResetToken = passwordResetRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid or non-existent token"));
+
+        validateTokenExpiry(passwordResetToken);
+
+        return passwordResetToken.getUser();
+    }
+
+    private void validateTokenExpiry(PasswordResetToken token) {
+        LocalDateTime expiryTime = token.getCreatedAt().plusMinutes(10); //10min
+        if (expiryTime.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Token has expired");
+        }
     }
 
 }

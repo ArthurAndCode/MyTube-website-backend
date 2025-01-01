@@ -1,9 +1,6 @@
 package Arthur.Code.MyTube_website_backend.controller;
 
-import Arthur.Code.MyTube_website_backend.dto.request.LoginRequest;
-import Arthur.Code.MyTube_website_backend.dto.request.PageableRequest;
-import Arthur.Code.MyTube_website_backend.dto.request.RegisterRequest;
-import Arthur.Code.MyTube_website_backend.dto.request.SearchUserRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.*;
 import Arthur.Code.MyTube_website_backend.dto.response.UserResponse;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.service.UserService;
@@ -75,4 +72,30 @@ public class UserController {
         userService.uploadProfilePicture(id, file);
         return ResponseEntity.status(HttpStatus.OK).body("Profile picture uploaded successfully");
     }
+
+    @PutMapping("/{id}/password")
+    public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody ChangePasswordRequest request) {
+        userService.updatePassword(id, request);
+        return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully.");
+    }
+
+    @PutMapping("/{id}/email")
+    public ResponseEntity<String> changeEmail(@PathVariable Long id, @RequestBody ChangeEmailRequest request) {
+        userService.updateEmail(id, request);
+        return ResponseEntity.status(HttpStatus.OK).body("Email changed successfully.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> requestPasswordReset(@RequestParam String email) {
+        userService.handleResetPasswordRequest(email);
+        return ResponseEntity.ok("Password reset link sent successfully to your email.");
+    }
+
+    @GetMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestParam String token) {
+        userService.handleResetPassword(token);
+        return ResponseEntity.ok("Your password has been successfully reset. A new temporary password has been sent to your email. ");
+    }
+
+    //Profile picture delete
 }
