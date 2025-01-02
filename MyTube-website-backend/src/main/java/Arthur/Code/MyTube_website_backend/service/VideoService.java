@@ -2,6 +2,7 @@ package Arthur.Code.MyTube_website_backend.service;
 
 import Arthur.Code.MyTube_website_backend.dto.request.PageableRequest;
 import Arthur.Code.MyTube_website_backend.dto.request.SearchVideoRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.UpdateDescriptionRequest;
 import Arthur.Code.MyTube_website_backend.dto.response.VideoResponse;
 import Arthur.Code.MyTube_website_backend.dto.request.VideoUploadRequest;
 import Arthur.Code.MyTube_website_backend.model.User;
@@ -133,4 +134,10 @@ public class VideoService {
                 .collect(Collectors.toList());
     }
 
+    public void updateDescription(Long id, UpdateDescriptionRequest request) {
+        Video video = getVideoByVideoId(id);
+        video.setDescription(request.getDescription());
+        video.setUpdatedAt(LocalDateTime.now());
+        videoRepository.save(video);
+    }
 }

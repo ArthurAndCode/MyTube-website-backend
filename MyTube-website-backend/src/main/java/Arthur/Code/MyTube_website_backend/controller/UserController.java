@@ -67,10 +67,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully.");
     }
 
-    @PostMapping("/{id}/upload")
+    @PostMapping("/{id}/profile-pictures")
     public ResponseEntity<String> uploadProfilePicture(@PathVariable Long id, @RequestBody MultipartFile file) {
         userService.uploadProfilePicture(id, file);
         return ResponseEntity.status(HttpStatus.OK).body("Profile picture uploaded successfully");
+    }
+
+    @DeleteMapping("/{id}/profile-pictures")
+    public ResponseEntity<String> deleteProfilePicture(@PathVariable Long id) {
+        userService.deleteProfilePicture(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Profile picture deleted successfully.");
     }
 
     @PutMapping("/{id}/password")

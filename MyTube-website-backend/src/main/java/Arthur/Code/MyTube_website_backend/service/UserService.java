@@ -195,10 +195,17 @@ public class UserService {
 
     public void uploadProfilePicture(Long id, MultipartFile file) {
         User user = getUserById(id);
+        deleteOldProfilePicture(user);
         String profilePicturePath = fileService.saveFile(file, FileService.FileType.PROFILE_PICTURE);
         user.setPicturePath(profilePicturePath);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
+    }
+
+    private void deleteOldProfilePicture(User user) {
+        if(user.getPicturePath() != null) {
+            fileService.deleteFile(user.getPicturePath());
+        }
     }
 
     private Pageable createPageable(int page, int size) {
@@ -299,4 +306,11 @@ public class UserService {
         }
     }
 
+    public void deleteProfilePicture(Long id) {
+        User user = getUserById(id);
+        deleteOldProfilePicture(user);
+        user.setPicturePath(null);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
 }

@@ -2,6 +2,7 @@ package Arthur.Code.MyTube_website_backend.controller;
 
 import Arthur.Code.MyTube_website_backend.dto.request.PageableRequest;
 import Arthur.Code.MyTube_website_backend.dto.request.SearchVideoRequest;
+import Arthur.Code.MyTube_website_backend.dto.request.UpdateDescriptionRequest;
 import Arthur.Code.MyTube_website_backend.dto.response.VideoResponse;
 import Arthur.Code.MyTube_website_backend.dto.request.VideoUploadRequest;
 import Arthur.Code.MyTube_website_backend.service.VideoService;
@@ -43,10 +44,16 @@ public class VideoController {
         return ResponseEntity.ok(videos);
     }
 
-    @PostMapping("/upload")
+    @PostMapping("/uploads")
     public ResponseEntity<String> uploadVideo(@ModelAttribute VideoUploadRequest request) {
         videoService.uploadVideo(request);
         return ResponseEntity.ok("Video uploaded successfully");
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateDescription(@PathVariable Long id, @RequestBody UpdateDescriptionRequest request) {
+        videoService.updateDescription(id, request);
+        return ResponseEntity.ok("Description updated successfully");
     }
 
     @DeleteMapping("/{id}")
