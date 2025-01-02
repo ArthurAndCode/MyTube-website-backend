@@ -195,14 +195,14 @@ public class UserService {
 
     public void uploadProfilePicture(Long id, MultipartFile file) {
         User user = getUserById(id);
-        deleteOldProfilePicture(user);
+        deleteExistingProfilePicture(user);
         String profilePicturePath = fileService.saveFile(file, FileService.FileType.PROFILE_PICTURE);
         user.setPicturePath(profilePicturePath);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
     }
 
-    private void deleteOldProfilePicture(User user) {
+    private void deleteExistingProfilePicture(User user) {
         if(user.getPicturePath() != null) {
             fileService.deleteFile(user.getPicturePath());
         }
@@ -256,15 +256,14 @@ public class UserService {
     }
 
     public void handleResetPasswordRequest(String email) {
-        System.out.println(email);
         User user = getUserByEmail(email);
-        deleteOldToken(user);
+        deleteExistingToken(user);
         PasswordResetToken tokenEntity = createPasswordResetTokenEntity(user);
         passwordResetRepository.save(tokenEntity);
         emailService.sendPasswordResetLink(email, tokenEntity);
     }
 
-    private void deleteOldToken(User user) {
+    private void deleteExistingToken(User user) {
         PasswordResetToken existingToken = passwordResetRepository.findByUserId(user.getId());
         if (existingToken != null) {
             passwordResetRepository.delete(existingToken);
@@ -286,7 +285,7 @@ public class UserService {
         user.setPassword(hashPassword(temporaryPassword));
         user.setUpdatedAt(LocalDateTime.now());
         emailService.sendTemporaryPassword(user.getEmail(), temporaryPassword);
-        deleteOldToken(user);
+        deleteExistingToken(user);
 
     }
 
@@ -308,9 +307,18 @@ public class UserService {
 
     public void deleteProfilePicture(Long id) {
         User user = getUserById(id);
-        deleteOldProfilePicture(user);
+        deleteExistingProfilePicture(user);
         user.setPicturePath(null);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
+    }
+
+    public void deleteUser(Long id, HttpServletResponse response) {
+        User user = getUserById(id);
+        deleteExistingToken(user);
+        clearCookieInBrowser(response);
+        deleteExistingProfilePicture(user);
+        userRepository.delete(user);
+
     }
 }

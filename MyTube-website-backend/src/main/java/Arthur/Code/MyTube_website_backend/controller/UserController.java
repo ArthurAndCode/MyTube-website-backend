@@ -103,5 +103,9 @@ public class UserController {
         return ResponseEntity.ok("Your password has been successfully reset. A new temporary password has been sent to your email. ");
     }
 
-    //Profile picture delete
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id, HttpServletResponse response) {
+        userService.deleteUser(id, response);
+        return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully.");
+    }
 }
