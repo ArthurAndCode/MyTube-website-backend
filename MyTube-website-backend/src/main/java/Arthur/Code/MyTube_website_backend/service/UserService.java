@@ -313,8 +313,9 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void deleteUser(Long id, HttpServletResponse response) {
+    public void deleteUser(Long id, DeleteAccountRequest request, HttpServletResponse response) {
         User user = getUserById(id);
+        comparePasswords(request.getPassword(), user.getPassword());
         deleteExistingToken(user);
         clearCookieInBrowser(response);
         deleteExistingProfilePicture(user);
