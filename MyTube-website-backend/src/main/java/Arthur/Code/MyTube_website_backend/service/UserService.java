@@ -193,10 +193,12 @@ public class UserService {
         response.addCookie(cookie);
     }
 
+
     public void uploadProfilePicture(Long id, MultipartFile file) {
         User user = getUserById(id);
-        deleteExistingProfilePicture(user);
+        fileService.validateInput(file, FileService.FileType.PROFILE_PICTURE);
         String profilePicturePath = fileService.saveFile(file, FileService.FileType.PROFILE_PICTURE);
+        deleteExistingProfilePicture(user);
         user.setPicturePath(profilePicturePath);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);

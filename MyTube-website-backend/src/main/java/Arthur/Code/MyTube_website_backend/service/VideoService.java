@@ -53,8 +53,10 @@ public class VideoService {
 
     public void uploadVideo(VideoUploadRequest request) {
         User user = userService.getUserById(request.getUserId());
-        String videoPath = fileService.saveFile(request.getVideo(), FileService.FileType.VIDEO);
+        fileService.validateInput(request.getVideo(), FileService.FileType.VIDEO);
+        fileService.validateInput(request.getThumbnail(), FileService.FileType.THUMBNAIL);
         String thumbnailPath = fileService.saveFile(request.getThumbnail(), FileService.FileType.THUMBNAIL);
+        String videoPath = fileService.saveFile(request.getVideo(), FileService.FileType.VIDEO);
         Video video = createVideoEntity(request, user, videoPath, thumbnailPath);
         videoRepository.save(video);
     }

@@ -1,5 +1,6 @@
 package Arthur.Code.MyTube_website_backend.service;
 
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +31,6 @@ public class FileService {
     }
 
     public String saveFile(MultipartFile file, FileType fileType) {
-        validateInput(file);
         String directory = resolveDirectory(fileType);
         String fileName = generateUniqueFileName(file.getOriginalFilename());
         Path filePath = Paths.get(directory, fileName);
@@ -64,11 +64,30 @@ public class FileService {
     }
 
 
-    private void validateInput(MultipartFile file) {
+    protected void validateInput(MultipartFile file, FileType fileType) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File cannot be null or empty");
         }
-        // sprawdzić czy plik jest odpowiedni
+        String mimeType = detectMimeType(file);
+        if (mimeType == null || !isValidMimeTypeForFileType(mimeType, fileType)) {
+            throw new IllegalArgumentException("Invalid file type for " + fileType + ": " + mimeType);
+        }
+    }
+
+    private String detectMimeType(MultipartFile file) {
+        Tika tika = new Tika();
+        try {
+            return tika.detect(file.getInputStream());
+        } catch (IOException e) {
+            throw new FileStorageException("Failed to detect MIME type", e);
+        }
+    }
+
+    private boolean isValidMimeTypeForFileType(String mimeType, FileType fileType) {
+        return switch (fileType) {
+            case VIDEO -> mimeType.equals("video/mp4") || mimeType.equals("video/avi") || mimeType.equals("video/quicktime");
+            case THUMBNAIL, PROFILE_PICTURE -> mimeType.equals("image/jpeg") || mimeType.equals("image/png");
+        };
     }
 
     private String resolveDirectory(FileType fileType) {
