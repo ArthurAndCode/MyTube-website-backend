@@ -1,5 +1,6 @@
 package Arthur.Code.MyTube_website_backend.dto.response;
 
+import Arthur.Code.MyTube_website_backend.model.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,4 +11,5 @@ public class UserResponse {
     private String username;
     private String email;
     private String profilePictureUrl;
+    private User.Role role;
 }

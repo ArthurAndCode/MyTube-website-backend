@@ -4,6 +4,7 @@ import Arthur.Code.MyTube_website_backend.dto.response.SubscriptionDetailsRespon
 import Arthur.Code.MyTube_website_backend.model.Subscription;
 import Arthur.Code.MyTube_website_backend.model.Video;
 import Arthur.Code.MyTube_website_backend.repository.SubscriptionRepository;
+import Arthur.Code.MyTube_website_backend.repository.UserRepository;
 import Arthur.Code.MyTube_website_backend.repository.VideoRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +16,12 @@ import java.util.Optional;
 public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
+    private final UserRepository userRepository;
     private final VideoRepository videoRepository;
 
-    public SubscriptionService(SubscriptionRepository subscriptionRepository, VideoRepository videoRepository) {
+    public SubscriptionService(SubscriptionRepository subscriptionRepository, UserRepository userRepository, VideoRepository videoRepository) {
         this.subscriptionRepository = subscriptionRepository;
+        this.userRepository = userRepository;
         this.videoRepository = videoRepository;
     }
 
@@ -36,6 +39,13 @@ public class SubscriptionService {
         if (userId.equals(channelId)) {
             throw new IllegalArgumentException("User ID and channel ID cannot be the same.");
         }
+        if (!userRepository.existsById(userId)) {
+            throw new IllegalArgumentException("User not found.");
+        }
+        if (!userRepository.existsById(channelId)) {
+            throw new IllegalArgumentException("Channel not found.");
+        }
+
     }
 
     private Optional<Subscription> findSubscription(Long userId, Long channelId) {

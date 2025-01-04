@@ -44,7 +44,7 @@ public class VideoController {
         return ResponseEntity.ok(videos);
     }
 
-    @PostMapping("/uploads")
+    @PostMapping()
     public ResponseEntity<String> uploadVideo(@ModelAttribute VideoUploadRequest request) {
         videoService.uploadVideo(request);
         return ResponseEntity.ok("Video uploaded successfully");

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "video_reactons")
+@Table(name = "video_reactions")
 public class VideoReaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

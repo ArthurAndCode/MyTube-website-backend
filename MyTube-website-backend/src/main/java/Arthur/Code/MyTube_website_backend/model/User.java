@@ -46,5 +46,17 @@ public class User {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @Column(name = "is_banned", nullable = false)
+    private boolean isBanned;
+
+    public enum Role {
+        USER,
+        MODERATOR,
+    }
 }
 

@@ -67,6 +67,9 @@ public class UserService {
 
     private User authenticateUser(LoginRequest loginRequest) {
         User user = getUserByEmail(loginRequest.getEmail());
+        if (user.isBanned()) {
+            throw new IllegalStateException("This user is already banned.");
+        }
         comparePasswords(loginRequest.getPassword(), user.getPassword());
         return user;
     }
@@ -123,16 +126,21 @@ public class UserService {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(hashPassword(registerRequest.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
+        user.setRole(User.Role.USER);
+        user.setBanned(false);
         return user;
     }
 
-    public User getUserByToken(String token) {
+    public UserResponse getUserByToken(String token) {
+        if (token == null) {
+            throw new IllegalStateException("No valid session token was found.");
+        }
         User user = userRepository.findByRememberMe(token)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         if (user.getRememberMeCreatedAt().isBefore(LocalDateTime.now().minusDays(7))) {
             throw new IllegalArgumentException("Token expired");
         }
-        return user;
+        return convertToUserDTO(user);
     }
 
     protected User getUserById(Long userId) {
@@ -151,6 +159,7 @@ public class UserService {
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setProfilePictureUrl(composeUrlPath(user.getPicturePath()));
+        dto.setRole(user.getRole());
         return dto;
     }
 
@@ -315,13 +324,54 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void deleteUser(Long id, DeleteAccountRequest request, HttpServletResponse response) {
+    public void deleteUserAsOwner(Long id, DeleteAccountRequest request, HttpServletResponse response) {
         User user = getUserById(id);
         comparePasswords(request.getPassword(), user.getPassword());
-        deleteExistingToken(user);
         clearCookieInBrowser(response);
-        deleteExistingProfilePicture(user);
-        userRepository.delete(user);
+        deleteUserAndRelatedData(user);
 
     }
+
+    public void deleteUserAsModerator(Long id) {
+        User user = getUserById(id);
+        deleteUserAndRelatedData(user);
+
+    }
+
+    private void deleteUserAndRelatedData(User user) {
+        deleteExistingToken(user);
+        deleteExistingProfilePicture(user);
+        userRepository.delete(user);
+    }
+
+    public void banUser(Long id) {
+        User user = getUserById(id);
+        user.setBanned(true);
+        user.setRememberMe(null);
+        user.setRememberMeCreatedAt(null);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    public void unbanUser(Long id) {
+        User user = getUserById(id);
+        user.setBanned(false);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    public void promoteToModerator(Long id) {
+        User user = getUserById(id);
+        user.setRole(User.Role.MODERATOR);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    public void demoteFromModerator(Long id) {
+        User user = getUserById(id);
+        user.setRole(User.Role.USER);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
 }

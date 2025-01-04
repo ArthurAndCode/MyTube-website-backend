@@ -2,7 +2,6 @@ package Arthur.Code.MyTube_website_backend.controller;
 
 import Arthur.Code.MyTube_website_backend.dto.request.*;
 import Arthur.Code.MyTube_website_backend.dto.response.UserResponse;
-import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
@@ -53,11 +52,8 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getUserByToken(@CookieValue(value = "rememberMeToken", required = false) String token) {
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No valid session token was found.");
-        }
-        User user = userService.getUserByToken(token);
+    public ResponseEntity<UserResponse> getUserByToken(@CookieValue(value = "rememberMeToken", required = false) String token) {
+        UserResponse user = userService.getUserByToken(token);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
@@ -106,7 +102,7 @@ public class UserController {
     //required password
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id, @RequestBody DeleteAccountRequest request, HttpServletResponse response) {
-        userService.deleteUser(id, request, response);
+        userService.deleteUserAsOwner(id, request, response);
         return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully.");
     }
 }
