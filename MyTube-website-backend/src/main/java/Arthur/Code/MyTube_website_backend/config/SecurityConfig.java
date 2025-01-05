@@ -50,7 +50,6 @@ public class SecurityConfig {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
-
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
