@@ -1,5 +1,6 @@
 package Arthur.Code.MyTube_website_backend.model;
 
+import Arthur.Code.MyTube_website_backend.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -70,10 +71,5 @@ public class User {
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<VideoReaction> videoReactions;
 
-
-    public enum Role {
-        USER,
-        MODERATOR,
-    }
 }
 

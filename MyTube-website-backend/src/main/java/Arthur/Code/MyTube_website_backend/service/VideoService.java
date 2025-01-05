@@ -5,6 +5,7 @@ import Arthur.Code.MyTube_website_backend.dto.request.SearchVideoRequest;
 import Arthur.Code.MyTube_website_backend.dto.request.UpdateDescriptionRequest;
 import Arthur.Code.MyTube_website_backend.dto.response.VideoResponse;
 import Arthur.Code.MyTube_website_backend.dto.request.VideoUploadRequest;
+import Arthur.Code.MyTube_website_backend.enums.FileType;
 import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.model.Video;
 import Arthur.Code.MyTube_website_backend.model.VideoReaction;
@@ -53,10 +54,10 @@ public class VideoService {
 
     public void uploadVideo(VideoUploadRequest request) {
         User user = userService.getUserById(request.getUserId());
-        fileService.validateInput(request.getVideo(), FileService.FileType.VIDEO);
-        fileService.validateInput(request.getThumbnail(), FileService.FileType.THUMBNAIL);
-        String thumbnailPath = fileService.saveFile(request.getThumbnail(), FileService.FileType.THUMBNAIL);
-        String videoPath = fileService.saveFile(request.getVideo(), FileService.FileType.VIDEO);
+        fileService.validateInput(request.getVideo(), FileType.VIDEO);
+        fileService.validateInput(request.getThumbnail(), FileType.THUMBNAIL);
+        String thumbnailPath = fileService.saveFile(request.getThumbnail(), FileType.THUMBNAIL);
+        String videoPath = fileService.saveFile(request.getVideo(), FileType.VIDEO);
         Video video = createVideoEntity(request, user, videoPath, thumbnailPath);
         videoRepository.save(video);
     }

@@ -1,5 +1,6 @@
 package Arthur.Code.MyTube_website_backend.service;
 
+import Arthur.Code.MyTube_website_backend.enums.FileType;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,10 +26,6 @@ public class FileService {
 
     @Value("${uploads.profile-pictures}")
     private String profilePicturesDir;
-
-    public enum FileType {
-        VIDEO, THUMBNAIL, PROFILE_PICTURE
-    }
 
     public String saveFile(MultipartFile file, FileType fileType) {
         String directory = resolveDirectory(fileType);

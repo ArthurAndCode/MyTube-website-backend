@@ -2,6 +2,8 @@ package Arthur.Code.MyTube_website_backend.service;
 
 import Arthur.Code.MyTube_website_backend.dto.request.*;
 import Arthur.Code.MyTube_website_backend.dto.response.UserResponse;
+import Arthur.Code.MyTube_website_backend.enums.FileType;
+import Arthur.Code.MyTube_website_backend.enums.Role;
 import Arthur.Code.MyTube_website_backend.model.PasswordResetToken;
 import Arthur.Code.MyTube_website_backend.model.Subscription;
 import Arthur.Code.MyTube_website_backend.model.User;
@@ -131,7 +133,7 @@ public class UserService {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(hashPassword(registerRequest.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
-        user.setRole(User.Role.USER);
+        user.setRole(Role.USER);
         user.setBanned(false);
         return user;
     }
@@ -210,8 +212,8 @@ public class UserService {
 
     public void uploadProfilePicture(Long id, MultipartFile file) {
         User user = getUserById(id);
-        fileService.validateInput(file, FileService.FileType.PROFILE_PICTURE);
-        String profilePicturePath = fileService.saveFile(file, FileService.FileType.PROFILE_PICTURE);
+        fileService.validateInput(file, FileType.PROFILE_PICTURE);
+        String profilePicturePath = fileService.saveFile(file, FileType.PROFILE_PICTURE);
         deleteExistingProfilePicture(user);
         user.setPicturePath(profilePicturePath);
         user.setUpdatedAt(LocalDateTime.now());
@@ -363,20 +365,20 @@ public class UserService {
 
     public void promoteToModerator(Long id) {
         User user = getUserById(id);
-        if (user.getRole() == User.Role.MODERATOR) {
+        if (user.getRole() == Role.MODERATOR) {
             throw new IllegalArgumentException("This user is already promoted");
         }
-        user.setRole(User.Role.MODERATOR);
+        user.setRole(Role.MODERATOR);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
     }
 
     public void demoteFromModerator(Long id) {
         User user = getUserById(id);
-        if (user.getRole() == User.Role.USER) {
+        if (user.getRole() == Role.USER) {
             throw new IllegalArgumentException("This user is already demoted");
         }
-        user.setRole(User.Role.USER);
+        user.setRole(Role.USER);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
     }

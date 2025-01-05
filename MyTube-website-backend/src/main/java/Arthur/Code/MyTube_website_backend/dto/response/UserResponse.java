@@ -1,6 +1,6 @@
 package Arthur.Code.MyTube_website_backend.dto.response;
 
-import Arthur.Code.MyTube_website_backend.model.User;
+import Arthur.Code.MyTube_website_backend.enums.Role;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,5 +11,5 @@ public class UserResponse {
     private String username;
     private String email;
     private String profilePictureUrl;
-    private User.Role role;
+    private Role role;
 }
