@@ -13,6 +13,7 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
 
     Page<Video> findByTitleContainingIgnoreCase(String title, Pageable pageable);
     Page<Video> findAllByUserId(Long userId, Pageable pageable);
+    List<Video> findAllByUserId(Long userId);
     List<Video> findAllByIdIn(List<Long> videoIds);
 
 }

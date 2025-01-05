@@ -5,9 +5,11 @@ import Arthur.Code.MyTube_website_backend.dto.response.UserResponse;
 import Arthur.Code.MyTube_website_backend.model.PasswordResetToken;
 import Arthur.Code.MyTube_website_backend.model.Subscription;
 import Arthur.Code.MyTube_website_backend.model.User;
+import Arthur.Code.MyTube_website_backend.model.Video;
 import Arthur.Code.MyTube_website_backend.repository.PasswordResetRepository;
 import Arthur.Code.MyTube_website_backend.repository.SubscriptionRepository;
 import Arthur.Code.MyTube_website_backend.repository.UserRepository;
+import Arthur.Code.MyTube_website_backend.repository.VideoRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,6 +30,7 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final VideoRepository videoRepository;
     private final PasswordResetRepository passwordResetRepository;
     private final SubscriptionRepository subscriptionRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -36,8 +40,9 @@ public class UserService {
     @Value("${app.url}")
     private String appUrl;
 
-    public UserService(UserRepository userRepository, PasswordResetRepository passwordResetRepository, SubscriptionRepository subscriptionRepository, BCryptPasswordEncoder passwordEncoder, FileService fileService, EmailService emailService) {
+    public UserService(UserRepository userRepository, VideoRepository videoRepository, PasswordResetRepository passwordResetRepository, SubscriptionRepository subscriptionRepository, BCryptPasswordEncoder passwordEncoder, FileService fileService, EmailService emailService) {
         this.userRepository = userRepository;
+        this.videoRepository = videoRepository;
         this.passwordResetRepository = passwordResetRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.passwordEncoder = passwordEncoder;
@@ -322,9 +327,22 @@ public class UserService {
     }
 
     private void deleteUserAndRelatedData(User user) {
+        deleteAllUserVideos(user);
         deleteExistingToken(user);
         deleteExistingProfilePicture(user);
         userRepository.delete(user);
+    }
+
+    private void deleteAllUserVideos(User user) {
+        List<Video> videos = videoRepository.findAllByUserId(user.getId());
+        videos.forEach(video -> {
+            try {
+                fileService.deleteFile(video.getFilePath());
+                fileService.deleteFile(video.getThumbnailPath());
+            } catch (FileService.FileStorageException e) {
+                throw new RuntimeException("Failed to delete associated files for video ID" + video.getId());
+            }
+        });
     }
 
     public void banUser(Long id) {

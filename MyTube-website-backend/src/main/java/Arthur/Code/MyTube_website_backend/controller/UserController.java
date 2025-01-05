@@ -99,7 +99,6 @@ public class UserController {
         return ResponseEntity.ok("Your password has been successfully reset. A new temporary password has been sent to your email. ");
     }
 
-    //required password
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id, @RequestBody DeleteAccountRequest request, HttpServletResponse response) {
         userService.deleteUserAsOwner(id, request, response);

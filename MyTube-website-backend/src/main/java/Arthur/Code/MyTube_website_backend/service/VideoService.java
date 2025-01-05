@@ -72,7 +72,7 @@ public class VideoService {
             fileService.deleteFile(video.getFilePath());
             fileService.deleteFile(video.getThumbnailPath());
         } catch (FileService.FileStorageException e) {
-            throw new RuntimeException("Failed to delete associated files for video");
+            throw new RuntimeException("Failed to delete associated files for video ID" + video.getId());
         }
     }
 
