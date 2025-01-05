@@ -1,6 +1,6 @@
 # MyTube backend API
 
-It's a YouTube-like application built with Java Spring Boot and PostgreSQL. It provides RESTful API for managing videos, users, comments, subscriptions, and moderation tasks. The app allows users to upload videos, comment and subscribe and much more.
+It's a YouTube-like application built with Java Spring Boot and PostgreSQL. It provides RESTful API for managing videos, users, comments, subscriptions, and moderation tasks. The app allows users to upload videos, comment, subscribe and much more.
 
 ## Features
 
@@ -33,7 +33,7 @@ It's a YouTube-like application built with Java Spring Boot and PostgreSQL. It p
 
 ### Subscription Management
 - **Subscribe/Unsubscribe:**
-  - Users can toggle subscriptions to channels.
+  - Users can subscribe/unsubscribe channels.
 - **Subscription Details:**
   - Retrieve subscription details between users and channels.
 
@@ -46,7 +46,8 @@ It's a YouTube-like application built with Java Spring Boot and PostgreSQL. It p
   - Delete videos and comments.
 
 ### Video Reactions
-- React to videos (like/dislike) and retrieve detailed reaction data.
+- React to videos (like/dislike)
+- Retrieve detailed reaction data.
 
 ## Technologies Used
 - **Framework:** Spring Boot 3.4.0
@@ -61,79 +62,76 @@ It's a YouTube-like application built with Java Spring Boot and PostgreSQL. It p
 | GET    | `/api/v1/users`                        | Retrieve a paginated list of users.               |
 | GET    | `/api/v1/users/search`                 | Search users by username.                         |
 | GET    | `/api/v1/users/{id}/my-subscriptions`  | Retrieve a paginated list of subscribed users.    |
+| GET    | `/api/v1/users/me`                     | Retrieve user details by token.                   |
+| GET    | `/api/v1/users/reset-password`         | Processes the password reset.                     |
 | POST   | `/api/v1/users/login`                  | Login a user.                                     |
 | POST   | `/api/v1/users/logout`                 | Logout a user.                                    |
-| GET    | `/api/v1/users/me`                     | Retrieve user details by token.                   |
 | POST   | `/api/v1/users`                        | Register a new user.                              |
 | POST   | `/api/v1/users/{id}/profile-pictures`  | Upload profile picture.                           |
-| DELETE | `/api/v1/users/{id}/profile-pictures`  | Delete profile picture.                           |
 | POST   | `/api/v1/users/reset-password`         | Initiate a password reset.                        |
-| GET    | `/api/v1/users/reset-password`         | Processes the password reset.                     |
 | PUT    | `/api/v1/users/{id}/password`          | Change user password.                             |
 | PUT    | `/api/v1/users/{id}/email`             | Change user email.                                |
+| DELETE | `/api/v1/users/{id}/profile-pictures`  | Delete profile picture.                           |
 | DELETE | `/api/v1/users/{id}`                   | Delete user account.                              |
-
-double checked >
 
 ### Video Endpoints
 | Method | Endpoint                          | Description                                  |
 |--------|-----------------------------------|----------------------------------------------|
-| GET    | `/api/v1/videos`                 | Retrieve a paginated list of videos.        |
-| POST   | `/api/v1/videos`                 | Upload a video.                             |
-| GET    | `/api/v1/videos/users/{id}`      | Get videos uploaded by a specific user.     |
-| GET    | `/api/v1/videos/search`          | Search videos by title.                     |
-| DELETE | `/api/v1/videos/{id}`            | Delete a video.                             |
+| GET    | `/api/v1/videos`                       | Retrieve a paginated list of videos.        |
+| GET    | `/api/v1/videos/users/{id}`            | Get videos uploaded by a specific user.     |
+| GET    | `/api/v1/videos/search`                | Search videos by title.                     |
+| GET    | `/api/v1/videos/users/{id}/liked`      | Get videos liked by specyfic user.          |
+| POST   | `/api/v1/videos`                       | Upload a video.                             |
+| PUT    | `/api/v1/videos/{id}`                  | Change video description.                   |
+| DELETE | `/api/v1/videos/{id}`                  | Delete a video.                             |
 
 ### Comment Endpoints
 | Method | Endpoint                          | Description                                  |
 |--------|-----------------------------------|----------------------------------------------|
-| GET    | `/api/v1/videos/{id}/comments`   | Retrieve comments for a video.              |
-| POST   | `/api/v1/videos/{id}/comments`   | Add a comment to a video.                   |
-| DELETE | `/api/v1/comments/{id}`          | Delete a comment.                           |
+| GET    | `/api/v1/videos/{id}/comments`    | Retrieve comments for a video.               |
+| POST   | `/api/v1/videos/{id}/comments`    | Add a comment to a video.                    |
+| DELETE | `/api/v1/comments/{id}`           | Delete a comment.                            |
 
 ### Moderator Endpoints
 | Method | Endpoint                          | Description                                  |
 |--------|-----------------------------------|----------------------------------------------|
-| PUT    | `/api/v1/moderator/users/{id}/ban`      | Ban a user.                             |
-| PUT    | `/api/v1/moderator/users/{id}/unban`    | Unban a user.                           |
-| DELETE | `/api/v1/moderator/users/{id}`          | Delete a user account.                  |
-| DELETE | `/api/v1/moderator/videos/{id}`         | Delete a video.                         |
+| PUT    | `/api/v1/moderator/users/{id}/ban`              | Ban a user.                             |
+| PUT    | `/api/v1/moderator/users/{id}/unban`            | Unban a user.                           |
+| PUT    | `/api/v1/moderator/users/users/{id}/promote`    | Promote a user to moderator.            |
+| PUT    | `/api/v1/moderator/users/users/{id}/demote`     | Demote a moderator to user.             |
+| DELETE | `/api/v1/moderator/users/{id}`                  | Delete a user account.                  |
+| DELETE | `/api/v1/moderator"/comments/{id}`              | Delete a comment.                       |
+| DELETE | `/api/v1/moderator/videos/{id}`                 | Delete a video.                         |
 
 ### Subscription Endpoints
 | Method | Endpoint                          | Description                                  |
 |--------|-----------------------------------|----------------------------------------------|
 | GET    | `/api/v1/users/{userId}/subscriptions/{channelId}` | Retrieve subscription details. |
-| POST   | `/api/v1/users/{userId}/subscriptions/{channelId}` | Toggle subscription.            |
+| POST   | `/api/v1/users/{userId}/subscriptions/{channelId}` | Toggle subscription.           |
 
 ### Video Reaction Endpoints
 | Method | Endpoint                          | Description                                  |
 |--------|-----------------------------------|----------------------------------------------|
-| GET    | `/api/v1/videos/{videoId}/reactions/users/{userId}` | Retrieve reaction details. |
+| GET    | `/api/v1/videos/{videoId}/reactions/users/{userId}` | Retrieve reaction details.   |
 | POST   | `/api/v1/videos/{videoId}/reactions/{reaction}/users/{userId}` | React to a video. |
 
 ## Setup Instructions
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/ArthurAndCode/youtube-clone-backend.git
-   cd youtube-clone-backend
+   git clone https://github.com/ArthurAndCode/MyTube-website-backend.git
+   cd MyTube-website-backend
    ```
 
-2. Update the application properties file (`application.yml`) with your PostgreSQL database credentials.
+2. Update the application properties file (`application.properties`) with your PostgreSQL database credentials and provide the relevant SMTP server credentials.
+3. Set up the upload directories: Make sure the uploads/ directory exists on your system, and inside it, create the subdirectories:
+- videos/
+- thumbnails/
+- profilePictures/
 
-3. Build and run the application:
+4. Build and run the application:
    ```bash
    mvn spring-boot:run
    ```
 
-4. Access the APIs at `http://localhost:8080`.
-
-## Future Enhancements
-- Implement video processing for different resolutions.
-- Add real-time notifications for subscriptions and reactions.
-- Integrate a recommendation system for videos.
-
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-
+5. Access the APIs at `http://localhost:8080`.
