@@ -1,6 +1,5 @@
 package Arthur.Code.MyTube_website_backend.repository;
 
-import Arthur.Code.MyTube_website_backend.model.Video;
 import Arthur.Code.MyTube_website_backend.model.VideoReaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

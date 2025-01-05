@@ -19,11 +19,13 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "subscriber_id", nullable = false)
-    private Long subscriberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subscriber_id", nullable = false)
+    private User subscriber;
 
-    @Column(name = "channel_id", nullable = false)
-    private Long channelId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private User channel;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

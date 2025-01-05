@@ -2,6 +2,7 @@ package Arthur.Code.MyTube_website_backend.service;
 
 import Arthur.Code.MyTube_website_backend.dto.response.SubscriptionDetailsResponse;
 import Arthur.Code.MyTube_website_backend.model.Subscription;
+import Arthur.Code.MyTube_website_backend.model.User;
 import Arthur.Code.MyTube_website_backend.model.Video;
 import Arthur.Code.MyTube_website_backend.repository.SubscriptionRepository;
 import Arthur.Code.MyTube_website_backend.repository.UserRepository;
@@ -26,26 +27,20 @@ public class SubscriptionService {
     }
 
     public void toggleSubscription(Long userId, Long channelId) {
-        validateSubscriptionRequest(userId, channelId);
+        User subscriber = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        User channel = userRepository.findById(channelId)
+                .orElseThrow(() -> new IllegalArgumentException("Channel not found."));
+        if (subscriber.getId().equals(channel.getId())) {
+            throw new IllegalArgumentException("User ID and channel ID cannot be the same.");
+        }
+
         Optional<Subscription> existingSubscription = findSubscription(userId, channelId);
         if (existingSubscription.isPresent()) {
             removeSubscription(existingSubscription.get());
         } else {
-            createSubscription(userId, channelId);
+            createSubscription(subscriber, channel);
         }
-    }
-
-    private void validateSubscriptionRequest(Long userId, Long channelId) {
-        if (userId.equals(channelId)) {
-            throw new IllegalArgumentException("User ID and channel ID cannot be the same.");
-        }
-        if (!userRepository.existsById(userId)) {
-            throw new IllegalArgumentException("User not found.");
-        }
-        if (!userRepository.existsById(channelId)) {
-            throw new IllegalArgumentException("Channel not found.");
-        }
-
     }
 
     private Optional<Subscription> findSubscription(Long userId, Long channelId) {
@@ -56,10 +51,10 @@ public class SubscriptionService {
         subscriptionRepository.delete(subscription);
     }
 
-    private void createSubscription(Long userId, Long channelId) {
+    private void createSubscription(User subscriber, User channel) {
         Subscription subscription = new Subscription();
-        subscription.setSubscriberId(userId);
-        subscription.setChannelId(channelId);
+        subscription.setSubscriber(subscriber);
+        subscription.setChannel(channel);
         subscription.setCreatedAt(LocalDateTime.now());
         subscriptionRepository.save(subscription);
     }
@@ -86,7 +81,7 @@ public class SubscriptionService {
 
         for (Subscription subscription : subscriptions) {
             subscriptionsCount++;
-            if (subscription.getSubscriberId().equals(userId)) {
+            if (subscription.getChannel().getId().equals(userId)) {
                 userSubscribed = true;
             }
         }

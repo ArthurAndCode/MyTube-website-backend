@@ -11,17 +11,17 @@ import Arthur.Code.MyTube_website_backend.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -223,31 +223,14 @@ public class UserService {
         return PageRequest.of(page, size, Sort.by("createdAt").descending());
     }
 
-    public Page<UserResponse> getMySubscriptions(Long id, PageableRequest request) {
+    public Page<UserResponse> getMySubscriptions(Long subscriberId, PageableRequest request) {
         Pageable pageable = createPageable(request.getPage(), request.getSize());
-        Page<Subscription> subscriptions = subscriptionRepository.findAllBySubscriberId(id, pageable);
-        List<Long> channelIds = getChannelsIds(subscriptions);
-        List<User> users = userRepository.findAllByIdIn(channelIds);
-        List<UserResponse> userResponses = getSortedUserResponses(subscriptions, users);
-        return new PageImpl<>(userResponses, pageable, subscriptions.getTotalElements());
+        Page<Subscription> subscriptions = subscriptionRepository.findAllBySubscriberId(subscriberId, pageable);
+        return convertToUserResponses(subscriptions);
     }
 
-    private List<UserResponse> getSortedUserResponses(Page<Subscription> subscriptions, List<User> users) {
-        List<UserResponse> userResponses = new ArrayList<>();
-        for (Subscription subscription : subscriptions) {
-            Long channelId = subscription.getChannelId();
-            users.stream()
-                    .filter(user -> user.getId().equals(channelId))
-                    .findFirst()
-                    .ifPresent(user -> userResponses.add(convertToUserDTO(user)));
-        }
-        return userResponses;
-    }
-
-    private static List<Long> getChannelsIds(Page<Subscription> subscriptions) {
-        return subscriptions.stream()
-                .map(Subscription::getChannelId)
-                .collect(Collectors.toList());
+    private Page<UserResponse> convertToUserResponses(Page<Subscription> subscriptions) {
+        return subscriptions.map(subscription -> convertToUserDTO(subscription.getChannel()));
     }
 
     public void updatePassword(Long id, ChangePasswordRequest request) {
@@ -362,6 +345,9 @@ public class UserService {
 
     public void promoteToModerator(Long id) {
         User user = getUserById(id);
+        if (user.getRole() == User.Role.MODERATOR) {
+            throw new IllegalArgumentException("This user is already promoted");
+        }
         user.setRole(User.Role.MODERATOR);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
@@ -369,6 +355,9 @@ public class UserService {
 
     public void demoteFromModerator(Long id) {
         User user = getUserById(id);
+        if (user.getRole() == User.Role.USER) {
+            throw new IllegalArgumentException("This user is already demoted");
+        }
         user.setRole(User.Role.USER);
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
