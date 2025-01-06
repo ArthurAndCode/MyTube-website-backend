@@ -1,6 +1,6 @@
 # MyTube backend API
 
-It's a YouTube-like application built with Java Spring Boot and PostgreSQL. It provides RESTful API for managing videos, users, comments, subscriptions, and moderation tasks. The app allows users to upload videos, comment, subscribe and much more.
+It's a YouTube-like application built with Java Spring Boot and PostgreSQL. It utilizes RESTful API for managing videos, users, comments, subscriptions, and moderation tasks. The app allows users to upload videos, comment, subscribe and much more.
 
 ## Features
 
