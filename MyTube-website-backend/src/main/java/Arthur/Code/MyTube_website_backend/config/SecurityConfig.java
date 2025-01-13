@@ -1,5 +1,6 @@
 package Arthur.Code.MyTube_website_backend.config;
 
+import Arthur.Code.MyTube_website_backend.enums.Role;
 import Arthur.Code.MyTube_website_backend.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +32,7 @@ public class SecurityConfig {
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/v1/moderator/**")
-                        .hasRole("MODERATOR");
+                        .hasRole(Role.MODERATOR.name());
                     auth.anyRequest().permitAll();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

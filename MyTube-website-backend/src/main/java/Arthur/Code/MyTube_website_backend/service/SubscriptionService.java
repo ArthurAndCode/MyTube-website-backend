@@ -88,7 +88,7 @@ public class SubscriptionService {
         return createSubscriptionDetailsResponse(subscriptionsCount, userSubscribed);
     }
 
-    private static SubscriptionDetailsResponse createSubscriptionDetailsResponse(long subscriptionsCount, boolean userSubscribed) {
+    private static SubscriptionDetailsResponse createSubscriptionDetailsResponse(Long subscriptionsCount, boolean userSubscribed) {
         SubscriptionDetailsResponse response = new SubscriptionDetailsResponse();
         response.setSubscriptionsCount(subscriptionsCount);
         response.setUserSubscribed(userSubscribed);

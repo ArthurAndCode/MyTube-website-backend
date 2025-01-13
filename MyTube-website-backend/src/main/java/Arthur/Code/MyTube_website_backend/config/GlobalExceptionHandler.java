@@ -1,4 +1,4 @@
-package Arthur.Code.MyTube_website_backend;
+package Arthur.Code.MyTube_website_backend.config;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -35,4 +35,4 @@ build/
 ### uplodas ###
 uploads/videos/*
 uploads/thumbnails/*
-uploads/profilePicture/*
+uploads/profilePictures/*

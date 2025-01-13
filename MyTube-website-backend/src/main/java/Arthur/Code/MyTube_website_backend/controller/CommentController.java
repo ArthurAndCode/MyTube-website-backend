@@ -18,21 +18,21 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    @GetMapping("/{id}/comments")
-    public ResponseEntity<Page<CommentResponse>> getVideoComments(@PathVariable Long id, @RequestBody PageableRequest pageableRequest) {
-        Page<CommentResponse> comments = commentService.getVideoComments(id, pageableRequest);
+    @GetMapping("/{videoId}/comments")
+    public ResponseEntity<Page<CommentResponse>> getVideoComments(@PathVariable Long videoId, @RequestBody PageableRequest pageableRequest) {
+        Page<CommentResponse> comments = commentService.getVideoComments(videoId, pageableRequest);
         return ResponseEntity.ok(comments);
     }
 
-    @PostMapping("/{id}/comments")
-    public ResponseEntity<String> addComment(@PathVariable Long id, @RequestBody CommentRequest commentRequest) {
-        commentService.addComment(id, commentRequest);
+    @PostMapping("/{videoId}/comments")
+    public ResponseEntity<String> addComment(@PathVariable Long videoId, @RequestBody CommentRequest commentRequest) {
+        commentService.addComment(videoId, commentRequest);
         return ResponseEntity.ok("Comment added successfully");
     }
 
-    @DeleteMapping("/comments/{id}")
-    public ResponseEntity<String> deleteComment(@PathVariable Long id) {
-        commentService.deleteComment(id);
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
+        commentService.deleteComment(commentId);
         return ResponseEntity.ok("Comment deleted successfully");
     }
 
