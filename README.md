@@ -124,14 +124,10 @@ It's a YouTube-like application built with Java Spring Boot and PostgreSQL. It u
    ```
 
 2. Update the application properties file (`application.properties`) with your PostgreSQL database credentials and provide the relevant SMTP server credentials.
-3. Set up the upload directories: Make sure the uploads/ directory exists on your system, and inside it, create the subdirectories:
-- videos/
-- thumbnails/
-- profilePictures/
 
-4. Build and run the application:
+3. Build and run the application:
    ```bash
    mvn spring-boot:run
    ```
 
-5. Access the APIs at `http://localhost:8080`.
+4. Access the APIs at `http://localhost:8080`.
