@@ -54,6 +54,8 @@ It's a YouTube-like application built with Java Spring Boot and PostgreSQL. It u
 - **Database:** PostgreSQL 17
 - **Dependency Management:** Maven
 
+![MyTube-drawSQL](https://github.com/user-attachments/assets/f4c36451-6300-4ed9-a97b-e168f207f5b2)
+
 ## API Endpoints
 You can find the Postman collection [here](https://github.com/ArthurAndCode/MyTube-website-backend/blob/main/documentation/MyTube.postman_collection.json).
 
