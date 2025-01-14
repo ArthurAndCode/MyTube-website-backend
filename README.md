@@ -91,9 +91,9 @@ You can find the Postman collection [here](https://github.com/ArthurAndCode/MyTu
 ### Comment Endpoints
 | Method | Endpoint                          | Description                                  |
 |--------|-----------------------------------|----------------------------------------------|
-| GET    | `/api/v1/videos/{id}/comments`    | Retrieve comments for a video.               |
-| POST   | `/api/v1/videos/{id}/comments`    | Add a comment to a video.                    |
-| DELETE | `/api/v1/comments/{id}`           | Delete a comment.                            |
+| GET    | `/api/v1/videos/{videoId}/comments`    | Retrieve comments for a video.          |
+| POST   | `/api/v1/videos/{videoId}/comments`    | Add a comment to a video.               |
+| DELETE | `/api/v1/comments/{commentId}`         | Delete a comment.                       |
 
 ### Moderator Endpoints
 | Method | Endpoint                          | Description                                  |
