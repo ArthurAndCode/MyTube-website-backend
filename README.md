@@ -100,8 +100,8 @@ You can find the Postman collection [here](https://github.com/ArthurAndCode/MyTu
 |--------|-----------------------------------|----------------------------------------------|
 | PUT    | `/api/v1/moderator/users/{id}/ban`              | Ban a user.                             |
 | PUT    | `/api/v1/moderator/users/{id}/unban`            | Unban a user.                           |
-| PUT    | `/api/v1/moderator/users/users/{id}/promote`    | Promote a user to moderator.            |
-| PUT    | `/api/v1/moderator/users/users/{id}/demote`     | Demote a moderator to user.             |
+| PUT    | `/api/v1/moderator/users/{id}/promote`          | Promote a user to moderator.            |
+| PUT    | `/api/v1/moderator/users/{id}/demote`           | Demote a moderator to user.             |
 | DELETE | `/api/v1/moderator/users/{id}`                  | Delete a user account.                  |
 | DELETE | `/api/v1/moderator"/comments/{id}`              | Delete a comment.                       |
 | DELETE | `/api/v1/moderator/videos/{id}`                 | Delete a video.                         |
